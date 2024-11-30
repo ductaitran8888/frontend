@@ -10,13 +10,18 @@ const OrderForm = ({ products, onSubmitOrder }) => {
         }));
     };
 
-    const handleSubmit = (productId) => {
-        const quantity = quantities[productId] || 0;
-        if (quantity > 0) {
-            onSubmitOrder(productId, quantity);
-            alert(`Đã thêm ${quantity} sản phẩm vào giỏ hàng!`);
+    const handleSubmit = () => {
+        const validOrders = Object.entries(quantities)
+            .filter(([_, quantity]) => quantity > 0) // Chỉ lấy các sản phẩm có số lượng > 0
+            .map(([productId, quantity]) => ({ productId, quantity }));
+
+        if (validOrders.length > 0) {
+            validOrders.forEach(({ productId, quantity }) => {
+                onSubmitOrder(productId, quantity);
+            });
+            alert('Đã lưu lại các đơn hàng!');
         } else {
-            alert('Vui lòng nhập số lượng lớn hơn 0!');
+            alert('Vui lòng nhập ít nhất một sản phẩm với số lượng lớn hơn 0!');
         }
     };
 
@@ -38,24 +43,24 @@ const OrderForm = ({ products, onSubmitOrder }) => {
                                 <p className="card-text">${product.price}</p>
                                 <input
                                     type="number"
-                                    className="form-control mb-2"
+                                    className="form-control"
                                     placeholder="Số lượng"
                                     value={quantities[product.id] || ''}
                                     onChange={(e) =>
                                         handleQuantityChange(product.id, parseInt(e.target.value, 10) || 0)
                                     }
                                 />
-                                <button
-                                    className="btn btn-primary w-100"
-                                    onClick={() => handleSubmit(product.id)}
-                                >
-                                    Thêm vào giỏ
-                                </button>
                             </div>
                         </div>
                     </div>
                 ))}
             </div>
+            <button
+                className="btn btn-success w-100 mt-4"
+                onClick={handleSubmit}
+            >
+                Lưu Đơn Hàng
+            </button>
         </div>
     );
 };
